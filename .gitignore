@@ -1,0 +1,7 @@
+.idea
+.css
+node_modules
+config.json
+/dist/
+/home-mock/fs-user/fs/
+!/home-mock/fs-user/fs/.gitkeep
