@@ -3,7 +3,9 @@
         <h2><span v-if="fileCount != null">{{ fileCount }} </span>files</h2>
         <ul>
             <li v-for="file in allFiles">
-                <a href="file" target="_blank"><img src="file" alt="file" /></a>
+                <a v-bind:href="file.url" target="_blank">
+                    <img v-bind:src="file.url" alt="file" />
+                </a>
             </li>
         </ul>
 
@@ -25,10 +27,10 @@
         },
         created: function() {
             axios.get('/api/filecount').then(res => {
-                this.fileCount = res.data.fileCount;
+                this.fileCount = res.data.count;
             });
             axios.get('/api/files/0/20').then(res => {
-                this.allFiles.push(res.data.files);
+                this.allFiles = this.allFiles.concat(res.data.files);
             });
         },
         methods: {

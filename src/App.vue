@@ -3,8 +3,15 @@
         <h1>lukeify fs</h1>
         <p v-if="!authenticated" id="statement">Personal cloud-based file system and storage. Enter the application key to authenticate.</p>
 
-        <form v-if="!authenticated">
-            <input id="key-entry" name="key-entry" type="text" v-model="key" v-on:keyup="authenticate" placeholder="key" />
+        <form v-if="!authenticated" v-on:submit.prevent>
+            <input id="key-entry"
+                   name="key-entry"
+                   type="text"
+                   ref="keyf"
+                   v-model="key"
+                   autocomplete="off"
+                   v-on:keyup="authenticate"
+                   placeholder="key" />
         </form>
 
         <dropzone
@@ -20,9 +27,12 @@
         </dropzone>
         <button v-on:click="upload" :disabled="isUploadDisabled" v-if="authenticated">Upload</button>
 
-        <files></files>
+        <files v-if="authenticated"></files>
 
-        <footer><span>Written by @lukealization. <a href="https://github.com/LukeNZ/lukeify-fs">github.com/LukeNZ/lukeify-fs</a></span></footer>
+        <footer>
+            <span>Written by @lukealization. <a href="https://github.com/LukeNZ/lukeify-fs">github.com/LukeNZ/lukeify-fs</a></span>
+            <a id="deauth" v-if="authenticated" v-on:click="deauth">De-auth</a>
+        </footer>
     </div>
 </template>
 
@@ -54,27 +64,61 @@
         },
         methods: {
             'authenticate': debounce(function() {
-                axios.post('/api/auth', { key: this.key }).then(res => {
-                    this.authenticated = true;
-                    localStorage.setItem('appKey', this.key);
-                    // flash blue
-                }).catch(res => {
-                    this.authenticated = false;
-                    // flash red
-                });
+                var self = this;
+                var flash = function(num, color) {
+                    if (num < 5) {
+                        var style = self.$refs.keyf.style.borderBottomColor || window.getComputedStyle(self.$refs.keyf)['border-bottom-color'];
+                        self.$refs.keyf.style.borderBottomColor = style !== color ? color : "#aaa";
+                        setTimeout(function () {
+                            flash(num + 1, color);
+                        }, 130);
+                    } else if (num === 5) {
+                        self.$refs.keyf.style.borderBottomColor = color;
+                        setTimeout(function () {
+                            flash(num + 1, color);
+                        }, 500);
+                    } else {
+                        if (color === "rgb(100, 149, 237)") {
+                            self.authenticated = true;
+                            localStorage.setItem('appKey', self.key);
+                        } else {
+                            self.authenticated = false;
+                        }
+                    }
+                };
+
+                if (this.key !== "") {
+                    axios.post('/api/auth', { key: this.key }).then(res => {
+                        flash(0, 'rgb(100, 149, 237)');
+                    }).catch(res => {
+                        flash(0, 'rgb(239, 104, 51)');
+                    });
+                } else {
+                    self.$refs.keyf.style.borderBottomColor = "#AAA";
+                }
             }, 1000),
+
             'allowUpload': function() {
                 this.isUploadDisabled = false;
             },
+
             'appendKey': function(file, xhr, formData) {
                 console.log(xhr);
             },
+
             'showSuccess': function(file) {
                 alert("File uploaded");
             },
+
             'upload': function() {
                 this.isUploadDisabled = true;
                 this.$refs.dropzone.processQueue();
+            },
+
+            'deauth': function() {
+                localStorage.removeItem('appKey');
+                this.key = "";
+                this.authenticated = false;
             }
         }
     }
@@ -125,7 +169,7 @@
     #key-entry {
         background-color:transparent;
         border:none;
-        border-bottom:2px solid #AAA;
+        border-bottom:3px solid #AAA;
         font-size:16px;
         margin:2em;
         padding:4px 10px;
@@ -169,10 +213,17 @@
         position:fixed;
         bottom:0;
         margin:1em;
+        width:calc(100% - 2em);
+        left:0;
+        text-align:left;
     }
 
     footer span, footer a {
         font-size:12px;
         text-decoration: none;
+    }
+
+    #deauth {
+        float:right;
     }
 </style>
