@@ -14,20 +14,22 @@
                    placeholder="key" />
         </form>
 
-        <dropzone
-                id="dropzone"
-                ref="dropzone"
-                useCustomDropzoneOptions
-                :dropzoneOptions="opts"
-                url="/api/upload"
-                v-on:vdropzone-success="showSuccess"
-                v-on:vdropzone-sending-multiple="appendKey"
-                v-on:vdropzone-file-added="allowUpload"
-                v-if="authenticated">
-        </dropzone>
-        <button v-on:click="upload" :disabled="isUploadDisabled" v-if="authenticated">Upload</button>
-
-        <files v-if="authenticated"></files>
+        <transition name="authed">
+            <div v-if="authenticated">
+                <dropzone
+                        id="dropzone"
+                        ref="dropzone"
+                        useCustomDropzoneOptions
+                        :dropzoneOptions="opts"
+                        url="/api/files"
+                        v-on:vdropzone-success="showSuccess"
+                        v-on:vdropzone-sending-multiple="appendKey"
+                        v-on:vdropzone-file-added="allowUpload">
+                </dropzone>
+                <button v-on:click="upload" :disabled="isUploadDisabled">Upload</button>
+                <files></files>
+            </div>
+        </transition>
 
         <footer>
             <span>Written by @lukealization. <a href="https://github.com/LukeNZ/lukeify-fs">github.com/LukeNZ/lukeify-fs</a></span>
@@ -48,7 +50,16 @@
             return {
                 authenticated: false,
                 key: "",
-                opts: { clickable: true, autoProcessQueue: false, uploadMultiple: true, maxFilesize: 1024, method: 'put' },
+                opts: {
+                    clickable: true,
+                    autoProcessQueue: false,
+                    uploadMultiple: true,
+                    maxFilesize: 1024,
+                    method: 'put',
+                    paramName: function() {
+                        return 'files'
+                    }
+                },
                 isUploadDisabled: true
             }
         },
@@ -103,7 +114,7 @@
             },
 
             'appendKey': function(file, xhr, formData) {
-                console.log(xhr);
+                xhr.setRequestHeader('App-Key', this.key);
             },
 
             'showSuccess': function(file) {
@@ -225,5 +236,13 @@
 
     #deauth {
         float:right;
+    }
+
+    .authed-enter-active, .authed-leave-active {
+        transition: opacity 0.5s ease-in-out;
+        opacity:1;
+    }
+    .authed-enter, .authed-leave-to {
+        opacity: 0;
     }
 </style>

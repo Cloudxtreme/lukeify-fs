@@ -1,6 +1,7 @@
 const path      = require('path');
-const files     = require('../controllers/files');
-const auth      = require('../controllers/auth');
+const files     = require('../controllers/filesController');
+const auth      = require('../controllers/authController');
+const uploads   = require('../services/uploads');
 
 /**
  * Routing table.
@@ -40,7 +41,7 @@ module.exports = function(app) {
     /**
      * Put file
      */
-    app.put('/api/files', (req, res) => {
+    app.put('/api/files', uploads.upload().array('files'), (req, res) => {
         return files.put(req, res);
     });
 };

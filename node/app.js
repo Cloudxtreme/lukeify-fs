@@ -2,55 +2,47 @@
  * Requires
  */
 const path = require('path');
-const fs = require('fs');
 let config = require('./config.json');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const r = require('rethinkdb');
-const filenameService = require('./services/filename');
+const storageDir = require('./services/storageDir');
 
 /**
  * Configure database. If the database and table does not exist, create it first.
  */
-r.connect(config.database, function(err, conn) {
-    if (err) throw err;
-
-    r.dbList().contains('lukeifyfs')
-        .do(databaseExists => {
-            return r.branch(databaseExists, { dbs_created: 0}, r.dbCreate('lukeifyfs'))
-        }).run(conn, (err, result) => {
-            if (result.dbs_created === 1) {
-                r.db('lukeifyfs').tableCreate('files', {
-                    primaryKey: 'name'
+let initializeDb = async function() {
+    let conn    = await r.connect(config.database);
+    let result  = await r.dbList().contains(config.dbName).do(databaseExists => {
+                    return r.branch(databaseExists, { dbs_created: 0 }, r.dbCreate(config.dbName));
                 }).run(conn);
-            }
-        });
-});
 
-/**
- * Setup file uploading and support
- * @type {multer}
- */
-const multer = require('multer');
-let storageDir = process.env.NODE_ENV === 'production' ? config.directory : path.join(__dirname, config.mockDirectory);
+    // If we're not in production, or we're in production and we just created a database, we want to
+    if (process.env.NODE_ENV !== 'production' || (process.env.NODE_ENV === "production" && result.dbs_created === 1)) {
 
-let storageSettings = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, storageDir);
-    },
-    filename: function(req, file, cb) {
-        cb(null, filenameService.randomFilenameForFile());
+        if (process.env.NODE_ENV !== 'production' && result.dbs_created === 0) {
+            var outcome = await r.db(config.dbName).tableDrop('files').run(conn);
+        }
+
+        await r.db(config.dbName).tableCreate('files', {
+            primaryKey: 'name'
+        }).run(conn);
     }
-});
-const upload = multer({ dest: storageDir });
+};
+
+try {
+    initializeDb();
+} catch (e) {
+
+}
 
 /**
  * Setup JSON body parsing and support for static directories.
  */
 app.use(bodyParser.json());
 app.use('/static', express.static(path.join(__dirname, '../dist/static')));
-app.use('/', express.static(storageDir));
+app.use('/', express.static(storageDir.get()));
 
 /**
  * Import routing table.
