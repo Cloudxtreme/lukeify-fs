@@ -1,11 +1,9 @@
 <template>
-    <a v-bind:href="file.filename" target="_blank">
-        <img v-bind:src="file.filename"
-             v-on:mouseenter="displayUrlCopyInput(file, true)"
-             v-on:mouseleave="displayUrlCopyInput(file, false)"
-             alt="file" />
-        <input class="url-copy" type="text" v-show="file.isDisplayingUrlCopyInput" />
-    </a>
+    <li>
+        <a v-bind:href="file.filename" target="_blank">
+            <img v-bind:src="file.filename" alt="file" v-on:click="toggleExpando(file)"/>
+        </a>
+    </li>
 </template>
 
 <script>
@@ -18,8 +16,8 @@
         },
         props: ['file'],
         methods: {
-            'displayUrlCopyInput': function(file, shouldDisplay) {
-                this.$set(file, 'isDisplayingUrlCopyInput', shouldDisplay);
+            toggleExpando: function(file) {
+                this.$emit('toggle-expando', file);
             }
         }
     }

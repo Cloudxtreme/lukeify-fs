@@ -1,8 +1,9 @@
 <template>
     <div id="files-vue">
         <h2><span v-if="fileCount != null">{{ fileCount }} </span>{{ fileCount !== 1 ? "files" : "file" }}</h2>
+
         <ul>
-            <li v-for="file in allFiles" v-bind:key="file.filename" v-bind:file="file" is="file"></li>
+            <file v-for="file in allFiles" v-bind:key="file.filename" v-bind:file="file" v-on:toggle-expando="toggleExpando"></file>
         </ul>
 
         <p id="no-files" v-if="fileCount === 0">Nothing here :(</p>
@@ -19,9 +20,11 @@
         name: 'files',
         data() {
             return {
-                'fileCount': null,
-                'allFiles': [],
-                'hasReachedEnd': true
+                fileCount: null,
+                allFiles: [],
+                hasReachedEnd: true,
+                shouldFetch: 50,
+                expando: null
             };
         },
         components: {
@@ -31,19 +34,31 @@
             axios.get('/api/filecount').then(res => {
                 this.fileCount = res.data.count;
             });
-            axios.get('/api/files/0/20').then(res => {
+            axios.get('/api/files/0/' + this.shouldFetch).then(res => {
                 this.allFiles = this.allFiles.concat(res.data.files);
             });
         },
         methods: {
-            'fetch': function() {
+            // Determine the number of image files that should appear in each row,
+            // and what the size of each image should be.
+            determineRowSettings: function() {
+                var rowWidth = window.innerWidth - (window.innerWidth < 800 ? 50 : 100);
+
+            },
+
+            // When "More" is clicked, fetch the next 50 images.
+            fetch: function() {
                 let currentFilePosition = this.allFiles.length;
-                axios.get('/api/files/' + currentFilePosition + '/20').then(res => {
-                    this.hasReachedEnd = res.data.files.length < 20;
+                axios.get('/api/files/' + currentFilePosition + '/' + this.shouldFetch).then(res => {
+                    this.hasReachedEnd = res.data.files.length < this.shouldFetch;
                     this.allFiles = this.allFiles.concat(res.data.files);
 
                 }).catch(res => {
                 });
+            },
+
+            toggleExpando: function() {
+
             }
         }
     }
@@ -57,10 +72,6 @@
     #no-files {
         font-size:20px;
         text-align:center;
-    }
-
-    ul {
-        list-style-type: none;
     }
 
     file, li {

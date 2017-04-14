@@ -70,6 +70,12 @@
         color:#465560;
     }
 
+    ul {
+        list-style-type: none;
+        margin:0;
+        padding:0;
+    }
+
     #statement {
         text-align:center;
         color:#465560;

@@ -74,6 +74,10 @@
         min-height:$dz-preview-size + ($dz-preview-margin * 2) + ($dz-padding * 2) + ($dz-border * 2);
         cursor:pointer;
 
+        .dz-message {
+            margin:6em 0;
+        }
+
         .dz-preview {
             margin:$dz-preview-margin;
 
