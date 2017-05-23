@@ -4,6 +4,9 @@ const config = require('../config.json');
 
 const FILES_TABLE = 'files';
 
+/**
+ * @class File
+ */
 export default class File {
 
     /**
@@ -17,9 +20,9 @@ export default class File {
 
     /**
      *
-     * @returns {}
+     * @returns {Promise<number>}
      */
-    public static async countFiles() {
+    public static async countFiles() : Promise<number> {
         let conn = await this.conn();
         return await r.db(config.dbName).table(FILES_TABLE).count().run(conn);
     }

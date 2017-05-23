@@ -3,6 +3,9 @@ import * as randomstring from "randomstring";
 import {ConnectOptions} from "rethinkdb";
 const config = require('../config.json');
 
+/**
+ * @class FileService
+ */
 export default class FileService {
 
     /**
@@ -42,9 +45,10 @@ export default class FileService {
     }
 
     /**
+     * For a given mimetype, return the extension that matches. Currently handles most image formats.
      *
-     * @param mime
-     * @returns {any}
+     * @param mime {string}
+     * @returns {string}
      */
     public static extension(mime: string) : string {
         switch (mime) {
@@ -54,6 +58,8 @@ export default class FileService {
                 return ".png";
             case "image/gif":
                 return ".gif";
+            case "image/raw":
+                return ".raw";
             default:
                 return "";
         }

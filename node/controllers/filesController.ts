@@ -3,14 +3,14 @@ import * as multer from 'multer';
 import File from "../models/File";
 
 /**
- *
+ * @class FilesController
  */
 export default class FilesController {
 
     /**
      *
-     * @param req
-     * @param res
+     * @param req {express.Request} The express request instance.
+     * @param res {express.Response} The express response instance.
      * @returns {Promise<Response>}
      */
     public static async count(req: express.Request, res: express.Response) : Promise<express.Response> {
@@ -24,8 +24,8 @@ export default class FilesController {
 
     /**
      *
-     * @param req
-     * @param res
+     * @param req {express.Request} The express request instance.
+     * @param res {express.Response} The express response instance.
      * @returns {Promise<Response>}
      */
     public static async index(req: express.Request, res: express.Response) : Promise<express.Response> {
@@ -40,6 +40,12 @@ export default class FilesController {
         }
     }
 
+    /**
+     *
+     * @param req {express.Request} The express request instance.
+     * @param res {express.Response} The express response instance.
+     * @returns {Promise<void>}
+     */
     public static async put(req: Express.Request, res: express.Response) {
         /*let files = req.files.map(f => {
             return {

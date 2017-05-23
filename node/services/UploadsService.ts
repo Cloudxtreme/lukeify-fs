@@ -5,7 +5,7 @@ import fileService from './FileService';
 const config = require('../config.json');
 
 /**
- *
+ * @class UploadsService
  */
 export default class UploadsService {
 

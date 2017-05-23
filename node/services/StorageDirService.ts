@@ -2,7 +2,7 @@ import * as path from 'path';
 const config = require('../config.json');
 
 /**
- *
+ * @class StorageDirService
  */
 export default class StorageDirService {
 
