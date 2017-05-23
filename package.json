@@ -20,7 +20,6 @@
   },
   "homepage": "https://github.com/LukeNZ/lukeify-fs#readme",
   "dependencies": {
-    "@types/rethinkdb": "github:types/npm-rethinkdb",
     "axios": "^0.15.3",
     "babel-core": "^6.24.1",
     "babel-preset-env": "^1.3.3",
