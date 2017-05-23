@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LukeNZ/lukeify-fs.git"
+    "url": "git+https://github.com/lukeify/lukeify-fs.git"
   },
   "author": "Luke Davia",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/LukeNZ/lukeify-fs/issues"
+    "url": "https://github.com/lukeify/lukeify-fs/issues"
   },
-  "homepage": "https://github.com/LukeNZ/lukeify-fs#readme",
+  "homepage": "https://github.com/lukeify/lukeify-fs#readme",
   "dependencies": {
     "axios": "^0.15.3",
     "babel-core": "^6.24.1",
